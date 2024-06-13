@@ -43,23 +43,32 @@ router.post("/upload",(req,res)=>{
     }
     else{
 
-      let filesUpload = files.upload[0];
+      let filesUpload = [...files.upload];
 
-      let {filepath,newFilename,originalFilename,mimetype} = filesUpload;
+      let listFiles = [];
 
-      let propsFile = {
-        filepath,
-        newFilename,
-        originalFilename,
-        mimetype
-      }
+      filesUpload.forEach(file=>{
 
-      return res.json(
-        Object.assign(
-          {},
-          propsFile,
-          isUploaded(uploadFolder.concat(`/${newFilename}`))
-        ));
+        let {filepath,newFilename,originalFilename,mimetype} = file;
+
+        let propsFile = {
+          filepath,
+          newFilename,
+          originalFilename,
+          mimetype
+        }
+
+        listFiles.push(
+          Object.assign(
+            {},
+            propsFile,
+            isUploaded(uploadFolder.concat(`/${newFilename}`))
+          ));
+
+
+      })
+
+      return res.json({listFiles});
 
     }
 

@@ -14,18 +14,6 @@ class Upload{
 
     }
 
-    uploadFile(form){
-
-        let data = new FormData(form);
-
-        fetch("/upload",{method:"POST",body:data}).then(response=>{
-            response.json().then(value=>{
-                alert(value.status);
-            })
-        })
-
-    }
-
     initEvents(){
 
         this.btnUploadFileEl.addEventListener("click",event=>{
@@ -44,6 +32,8 @@ class Upload{
 
             this.getFirebaseRef();
 
+            this.toggleOptionsElement();
+
         })
 
         this.btnUploadMobileEl.addEventListener("click",event=>{
@@ -54,7 +44,7 @@ class Upload{
 
         this.btnCancelOptions.addEventListener("click",event=>{
 
-            this.toggleOptionsElement("cancel");
+            this.toggleOptionsElement();
 
         })
 
@@ -70,6 +60,104 @@ class Upload{
 
         })
 
+    }
+
+    uploadFile(form){
+
+        let data = new FormData(form);
+
+        fetch("/upload",{method:"POST",body:data}).then(response=>{
+
+            response.json().then(files=>{
+
+                files.listFiles.forEach(file=>{
+
+                    if(file.status == 200){
+
+                    try{
+
+                        this.addFileFirebase(file);
+                        
+                    }
+                    catch(err){
+
+                        alert(err);
+
+                    }
+                    
+                }
+                else{
+
+                    alert("erro no upload");
+
+                }
+
+            })
+
+            this.readFiles();
+
+        })
+
+        })
+
+    }
+
+    readFiles(){
+
+        this.getFirebaseRef().on("value",snapshot=>{
+
+            snapshot.forEach(file=>{
+                
+                let fileKey = file.key;
+                let fileValue = file.val();
+
+                this.addFileIcon(fileValue);
+
+            })
+
+        })
+
+    
+    }
+
+    addFileIcon(file){
+
+        this.fileList.innerHTML += 
+            `
+            <li>
+                <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
+                <span>title.txt</span>
+            </li>
+            `;
+    }
+
+    getFileIcon(mimetype){
+
+        let icon;
+
+        switch(mimetype){
+
+            case "image/jpeg":
+                icon = "mp3.png";
+                break;
+
+            case "image/png":
+                icon = "mp4.png";
+                break;
+
+            default:
+                alert("icone não disponivel");
+                return;
+        }
+
+        return icon;
+
+    }
+
+
+    addFileFirebase(file){
+
+        this.getFirebaseRef().push().set(file);
     }
 
     selectFile(file){
@@ -101,13 +189,10 @@ class Upload{
                 classElToRemove = "_active_file-option"
                 break;
 
-            case "cancel":
+            default:
                 this.upload_FileOptions.className = "file-options-buttons";
                 this.optionContentEl.classList.remove("_disabled");
                 return;
-
-            default:
-                return false;
 
         }
 

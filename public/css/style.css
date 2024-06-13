@@ -242,6 +242,7 @@
 
     .container{
         flex-direction: column;
+        justify-content: start;
     }
 
     .brand{
@@ -260,7 +261,6 @@
     }
 
     .files-option-container{
-        /* display: none; */
         order: 1;
         width: 100%;
         position: sticky;
@@ -279,13 +279,13 @@
 
     .btn-upload-mobile-container{
         display: block;
-        position: sticky;
-        bottom: 5em;
-        margin-left: 85%;
+        position: absolute;
+        bottom: 20%;
+        right: 8%;
+        z-index: 100;
     }
 
     .mobile-btn-upload{
-        display: block;
         width: 2em;
         height: 2em;
         border-radius: 50%;
@@ -313,7 +313,7 @@
         background-color: #00969F;
         justify-content: space-between;
         align-items: center;
-        padding: 3.1em 1em;
+        padding: 2.3em 1em;
     }
 
     .file-options-buttons._active_upload-option button,
