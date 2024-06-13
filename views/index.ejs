@@ -4,6 +4,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel='stylesheet' href='/css/style.css' />
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> -->
+    <!-- <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script> -->
+    <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script defer src="/js/firebase.js"></script>
     <script defer src="/js/main.js"></script>
     <script defer src="/js/index.js"></script>
   </head>
@@ -173,13 +178,21 @@
 
           <div class="file-options-buttons">
 
-            <button class="newFolder">Nova pasta</button>
+            <button class="newFolder">Pasta</button>
             <button class="rename">Renomear</button>
             <button class="remove">Excluir</button>
-            <button class="upload">Upload</button>
+            <button class="upload">Arquivo</button>
             <button class="cancel">Cancelar</button>
 
           </div>
+
+          <form class="input-upload-form" enctype="multipart/form-data">
+
+            <input type="file" name="upload" class="file-upload" multiple>
+
+            <input type="submit" name="form">
+
+          </form>
 
         </div>
 

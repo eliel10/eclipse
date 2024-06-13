@@ -232,6 +232,10 @@
     background-color: rgba(0,150,159,18%);
 }
 
+.option-content .input-upload-form{
+    display: none;
+}
+
 /* media queries */
 
 @media (max-width:600px){
@@ -261,11 +265,6 @@
         width: 100%;
         position: sticky;
     }
-
-    .file-options-buttons{
-       
-    }
-
 
     .current-folder-container{
         text-align: center;
@@ -342,6 +341,11 @@
     .file-options-buttons .cancel{
         background-color: #363636;
         color: #fff;
+    }
+
+    .file-options-buttons._active_upload-option .upload{
+        color:#017076;
+        font-weight: 600;
     }
 
     .file-options-buttons._active_upload-option .cancel{

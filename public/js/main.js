@@ -2,6 +2,9 @@ class Upload{
 
     constructor(){
         
+        this.btnUploadFileEl = document.querySelector(".upload");
+        this.inputUploadEl = document.querySelector(".file-upload");
+        this.formUploadEl = document.querySelector(".input-upload-form");
         this.btnUploadMobileEl = document.querySelector(".mobile-btn-upload");
         this.upload_FileOptions = document.querySelector(".file-options-buttons");
         this.optionContentEl = document.querySelector(".option-content form");
@@ -11,7 +14,37 @@ class Upload{
 
     }
 
+    uploadFile(form){
+
+        let data = new FormData(form);
+
+        fetch("/upload",{method:"POST",body:data}).then(response=>{
+            response.json().then(value=>{
+                alert(value.status);
+            })
+        })
+
+    }
+
     initEvents(){
+
+        this.btnUploadFileEl.addEventListener("click",event=>{
+
+            this.inputUploadEl.click();
+
+        })
+
+        this.inputUploadEl.addEventListener("change",event=>{
+
+            let form = this.formUploadEl;
+
+            this.uploadFile(form);
+
+            form.reset();
+
+            this.getFirebaseRef();
+
+        })
 
         this.btnUploadMobileEl.addEventListener("click",event=>{
 
@@ -81,6 +114,12 @@ class Upload{
         this.upload_FileOptions.classList.add(classEl);
         this.upload_FileOptions.classList.remove(classElToRemove);
         this.optionContentEl.classList.add("_disabled");
+
+    }
+
+    getFirebaseRef(){
+
+        return firebase.database().ref("home");
 
     }
 
