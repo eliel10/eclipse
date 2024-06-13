@@ -122,7 +122,7 @@ class Upload{
 
     addFileIcon(file){
 
-        this.fileList.innerHTML += 
+        this.fileList.innerHTML = 
             `
             <li>
                 <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
