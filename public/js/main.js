@@ -103,13 +103,14 @@ class Upload{
     }
 
     readFiles(){
-
+        this.fileList.innerHTML = "";
         this.getFirebaseRef().on("value",snapshot=>{
 
             snapshot.forEach(file=>{
                 
                 let fileKey = file.key;
                 let fileValue = file.val();
+
 
                 this.addFileIcon(fileValue);
 
@@ -122,7 +123,7 @@ class Upload{
 
     addFileIcon(file){
 
-        this.fileList.innerHTML = 
+        this.fileList.innerHTML += 
             `
             <li>
                 <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
