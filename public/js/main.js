@@ -11,6 +11,61 @@ class Upload{
         this.btnCancelOptions = this.upload_FileOptions.querySelector(".cancel");
         this.fileList = document.querySelector(".list-files");
         this.initEvents();
+        this.readFiles();
+
+    }
+
+    initEventsFile(){
+
+        this.getFileElements().forEach(fileEl=>{
+
+            fileEl.addEventListener("click",event=>{
+
+                if(event.ctrlKey){
+
+                    this.selectFile(fileEl,{mult:true});
+
+                }
+                else if(event.shiftKey){
+
+                }
+                else{
+
+                    this.removeActiveClass();
+                    this.selectFile(fileEl);
+
+                }
+
+                this.toggleBtnRename();
+                this.toggleOptionsElement("_active_file-option");
+                
+
+            })
+
+        })
+
+    }
+
+    toggleBtnRename(){
+
+        let filesSelected = this.getFileElementsActive();
+
+        if(filesSelected.length > 1){
+
+            this.upload_FileOptions.querySelector(".rename").style.display = "none";
+
+        }
+        else{
+
+            this.upload_FileOptions.querySelector(".rename").style.display = "";
+
+        }
+
+    }
+
+    getFileElementsActive(){
+
+        return [...this.fileList.querySelectorAll(".active_li")];
 
     }
 
@@ -30,8 +85,6 @@ class Upload{
 
             form.reset();
 
-            this.getFirebaseRef();
-
             this.toggleOptionsElement();
 
         })
@@ -45,20 +98,29 @@ class Upload{
         this.btnCancelOptions.addEventListener("click",event=>{
 
             this.toggleOptionsElement();
+            this.removeActiveClass();
 
         })
 
+    }
 
-        this.getFiles().forEach(file=>{
+    removeActiveClass(){
 
-            file.addEventListener("click",event=>{
+        this.getFileElements().forEach(el=>{
 
-                this.selectFile(file);
-                this.toggleOptionsElement("_active_file-option");
+            if(el.className == "active_li"){
 
-            })
+                el.classList.remove("active_li");
+
+            }
 
         })
+
+    }
+
+    getFileElements(){
+
+        return [...this.fileList.querySelectorAll("li")];
 
     }
 
@@ -102,8 +164,16 @@ class Upload{
 
     }
 
-    readFiles(){
+    resetIconsFile(){
+
         this.fileList.innerHTML = "";
+
+    }
+
+    readFiles(){
+
+        this.resetIconsFile();
+
         this.getFirebaseRef().on("value",snapshot=>{
 
             snapshot.forEach(file=>{
@@ -111,47 +181,59 @@ class Upload{
                 let fileKey = file.key;
                 let fileValue = file.val();
 
-
                 this.addFileIcon(fileValue);
 
             })
 
         })
 
-    
     }
 
     addFileIcon(file){
 
+        let fileInfoString = JSON.stringify(file);
+        
+
         this.fileList.innerHTML += 
             `
-            <li>
+            <li data-infoFile='${fileInfoString}'>
                 <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
-                <span>title.txt</span>
+                <span>${file.originalFilename}</span>
             </li>
             `;
+
+            this.initEventsFile();            
     }
 
-    getFileIcon(mimetype){
+    getFileIcon(type){
 
-        let icon;
-
-        switch(mimetype){
-
-            case "image/jpeg":
-                icon = "mp3.png";
-                break;
-
-            case "image/png":
-                icon = "mp4.png";
-                break;
-
-            default:
-                alert("icone não disponivel");
-                return;
+        let mimetypes = {
+            "image/jpeg":"pdf.png",
+            "application/pdf":"pdf.png",
+            "application/msword":"docx.png",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document":"docx.png",
+            "application/vnd.ms-excel":"xlsx.png",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":"xlsx.png",
+            "application/vnd.ms-powerpoint":"pptx.png",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation":"pptx.png",
+            "text/plain":"txt.png",
+            "audio/mpeg":"mp3.png",
+            "audio/mp3":"mp3.png",
+            "audio/wav":"mp3.png",
+            "audio/ogg":"mp3.png",
+            "audio/midi":"mp3.png",
+            "audio/aac":"mp3.png",
+            "video/x-msvideo":"mp4.png",
+            "video/mpeg":"mp4.png",
+            "video/quicktime":"mp4.png",
+            "video/webm":"mp4.png",
+            "video/ogg":"mp4.png",
+            "video/x-matroska":"mp4.png",
+            "text/html":"html.png",
+            "text/html":"html.png"
         }
 
-        return icon;
+        return mimetypes[type];
 
     }
 
@@ -159,20 +241,19 @@ class Upload{
     addFileFirebase(file){
 
         this.getFirebaseRef().push().set(file);
+
     }
 
-    selectFile(file){
+    selectFile(file,optionSelect = false){
+
+        if(optionSelect.mult){
+
+            file.classList.toggle("active_li");
+            return;
+
+        }
 
         file.classList.add("active_li");
-
-    }
-
-
-    getFiles(){
-
-        let files = this.fileList.querySelectorAll("li");
-
-        return [...files];
 
     }
 
