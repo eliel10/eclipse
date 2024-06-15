@@ -9,9 +9,18 @@ class Upload{
         this.upload_FileOptions = document.querySelector(".file-options-buttons");
         this.optionContentEl = document.querySelector(".option-content form");
         this.btnCancelOptions = this.upload_FileOptions.querySelector(".cancel");
+        this.btnRenameOptions = this.upload_FileOptions.querySelector(".rename");
+        this.btnRemoveOptions = this.upload_FileOptions.querySelector(".remove");
         this.fileList = document.querySelector(".list-files");
+        this.initialize();
+
+    }
+
+    initialize(){
+
         this.initEvents();
         this.readFiles();
+        this.toggleBtnsToFile();
 
     }
 
@@ -36,7 +45,7 @@ class Upload{
 
                 }
 
-                this.toggleBtnRename();
+                this.toggleBtnsToFile();
                 this.toggleOptionsElement("_active_file-option");
                 
 
@@ -46,28 +55,6 @@ class Upload{
 
     }
 
-    toggleBtnRename(){
-
-        let filesSelected = this.getFileElementsActive();
-
-        if(filesSelected.length > 1){
-
-            this.upload_FileOptions.querySelector(".rename").style.display = "none";
-
-        }
-        else{
-
-            this.upload_FileOptions.querySelector(".rename").style.display = "";
-
-        }
-
-    }
-
-    getFileElementsActive(){
-
-        return [...this.fileList.querySelectorAll(".active_li")];
-
-    }
 
     initEvents(){
 
@@ -101,6 +88,62 @@ class Upload{
             this.removeActiveClass();
 
         })
+
+        this.btnRenameOptions.addEventListener("click",event=>{
+
+            this.renameFile();
+
+        })
+
+    }
+
+    toggleBtnsToFile(){
+
+        let filesSelected = this.getFileElementsActive();
+
+        if(filesSelected.length > 1){
+
+            this.btnRenameOptions.style.display = "none";
+
+        }
+        else if(filesSelected.length == 0){
+
+            this.btnRenameOptions.style.display = "none";
+            this.btnRemoveOptions.style.display = "none";
+
+        }
+        else{
+
+            this.btnRenameOptions.style.display = "";
+            this.btnRemoveOptions.style.display = "";
+
+        }
+
+    }
+
+    getFileElementsActive(){
+
+        return [...this.fileList.querySelectorAll(".active_li")];
+
+    }
+
+    renameFile(){
+
+        let fileToRename = this.getFileElementsActive()[0];
+
+        let fileInfo = JSON.parse(fileToRename.dataset.infofile);
+
+        let oldFilename = fileInfo.originalFilename;
+
+        let newFilename = prompt("Digite o novo nome do arquivo:",oldFilename);
+
+        fileInfo.originalFilename = newFilename;
+
+        let fileKey = fileInfo.key;
+
+        this.getFirebaseRef().child(fileKey).set(fileInfo);
+
+        console.log(fileToRename);
 
     }
 
@@ -156,8 +199,6 @@ class Upload{
 
             })
 
-            this.readFiles();
-
         })
 
         })
@@ -172,16 +213,16 @@ class Upload{
 
     readFiles(){
 
-        this.resetIconsFile();
-
         this.getFirebaseRef().on("value",snapshot=>{
+
+            this.resetIconsFile();
 
             snapshot.forEach(file=>{
                 
                 let fileKey = file.key;
                 let fileValue = file.val();
 
-                this.addFileIcon(fileValue);
+                this.addFileIcon(Object.assign({},fileValue,{key:fileKey}));
 
             })
 
@@ -192,7 +233,6 @@ class Upload{
     addFileIcon(file){
 
         let fileInfoString = JSON.stringify(file);
-        
 
         this.fileList.innerHTML += 
             `
