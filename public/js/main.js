@@ -11,6 +11,7 @@ class Upload{
         this.btnCancelOptions = this.upload_FileOptions.querySelector(".cancel");
         this.btnRenameOptions = this.upload_FileOptions.querySelector(".rename");
         this.btnRemoveOptions = this.upload_FileOptions.querySelector(".remove");
+        this.btnNewFolder = this.upload_FileOptions.querySelector(".newFolder");
         this.fileList = document.querySelector(".list-files");
         this.initialize();
 
@@ -95,6 +96,31 @@ class Upload{
 
         })
 
+        this.btnNewFolder.addEventListener("click",event=>{
+
+            this.newFolder();
+
+        })
+
+        this.btnRemoveOptions.addEventListener("click",event=>{
+
+            this.deleteFile();
+
+        })
+
+    }
+
+    newFolder(){
+
+        let folderName = prompt("Digite o nome da pasta:");
+
+        let folderProps = {
+            originalFilename:folderName,
+            mimetype:"folder"
+        }
+
+        this.getFirebaseRef().push().set(folderProps);
+
     }
 
     toggleBtnsToFile(){
@@ -144,6 +170,18 @@ class Upload{
         this.getFirebaseRef().child(fileKey).set(fileInfo);
 
         console.log(fileToRename);
+
+    }
+
+    deleteFile(){
+
+        this.getFileElementsActive().forEach(file=>{
+
+            let fileKey = JSON.parse(file.dataset.infofile).key;
+
+            this.getFirebaseRef().child(fileKey).remove();
+
+        })
 
     }
 
@@ -248,6 +286,7 @@ class Upload{
     getFileIcon(type){
 
         let mimetypes = {
+            "folder":"folder.png",
             "image/jpeg":"pdf.png",
             "application/pdf":"pdf.png",
             "application/msword":"docx.png",
