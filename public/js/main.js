@@ -114,6 +114,8 @@ class Upload{
 
         let folderName = prompt("Digite o nome da pasta:");
 
+        if(!folderName) return;
+
         let folderProps = {
             originalFilename:folderName,
             mimetype:"folder"
@@ -169,19 +171,56 @@ class Upload{
 
         this.getFirebaseRef().child(fileKey).set(fileInfo);
 
-        console.log(fileToRename);
 
     }
 
     deleteFile(){
 
+        let filesToDelete = [];
+
         this.getFileElementsActive().forEach(file=>{
 
-            let fileKey = JSON.parse(file.dataset.infofile).key;
+            let {key,newFilename} = JSON.parse(file.dataset.infofile);
 
-            this.getFirebaseRef().child(fileKey).remove();
+            filesToDelete.push({newFilename,key});
 
         })
+
+        let data = new FormData();
+
+        data.append("files",JSON.stringify(filesToDelete));
+
+        fetch("/remove",
+            {
+                method:"DELETE",
+                body:data
+            }
+        ).then(result=>{
+            result.json().then(files=>{
+
+              this.removeFileFirebase(files);
+
+            })
+        })
+
+    }
+
+    removeFileFirebase(files){
+
+        let filesSuccess = files.infoSuccessFile;
+        let filesError = files.infoErrorFile;
+
+        for(let file of filesError){
+
+            alert(`FileError: ${file.fileError.newFilename} | ${file.msgError.code}`);
+
+        }
+
+        for(let file of filesSuccess){
+
+            this.getFirebaseRef().child(file.fileSuccess.key).remove();
+
+        }
 
     }
 
@@ -212,32 +251,15 @@ class Upload{
         fetch("/upload",{method:"POST",body:data}).then(response=>{
 
             response.json().then(files=>{
+                
+                files.forEach(file=>{
 
-                files.listFiles.forEach(file=>{
+                    console.log(file);
+                    this.addFileFirebase(file);
 
-                    if(file.status == 200){
-
-                    try{
-
-                        this.addFileFirebase(file);
-                        
-                    }
-                    catch(err){
-
-                        alert(err);
-
-                    }
-                    
-                }
-                else{
-
-                    alert("erro no upload");
-
-                }
+                })
 
             })
-
-        })
 
         })
 

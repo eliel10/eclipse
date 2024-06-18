@@ -1,17 +1,21 @@
 var express = require('express');
 var router = express.Router();
-var fs = require("fs");
+var fs = require("node:fs/promises")
 var formidable = require("formidable");
 var path = require("path");
+const { info } = require('console');
+const { access } = require('node:fs');
+
+let uploadFolder = path.join(__dirname,"..","upload");
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Eclipse' });
 });
 
-router.post("/upload",(req,res)=>{
+router.post("/upload",async(req,res)=>{
 
-  let uploadFolder = path.join(__dirname,"..","upload");
+  await createFolderToUpload(uploadFolder);
 
   let form = new formidable.IncomingForm(
     {
@@ -20,72 +24,138 @@ router.post("/upload",(req,res)=>{
     }
   );
 
-  if(!fs.existsSync(uploadFolder)){
-
-    fs.mkdir(uploadFolder,err=>{
+    form.parse(req,(err,fields,files)=>{
 
       if(err){
-
+  
         return res.json({err});
-
+        
       }
+      else{
+  
+        let filesUpload = [...files.upload];
+  
+        let listFiles = [];
+  
+        filesUpload.forEach(async file=>{
+  
+          let {filepath,newFilename,originalFilename,mimetype} = file;
+  
+          let propsFile = {
+            filepath,
+            newFilename,
+            originalFilename,
+            mimetype
+          }
+  
+          let infoFile = isUploaded(uploadFolder.concat(`/${newFilename}`));
 
-    });
+          listFiles.push(
+            Object.assign(
+              {},
+              propsFile,
+              infoFile
+            ));
+  
+        })
 
-  }
+        return res.json(listFiles);
+      }
+  
+    })
+ 
+})
 
-  form.parse(req,(err,fields,files)=>{
+router.delete("/remove",(req,res)=>{
 
-    if(err){
+    let form = new formidable.IncomingForm();
 
-      return res.json({err});
+    form.parse(req,async(err,fields,files)=>{
+
+      let filesToDelete = fields.files;
+
+      let infoDeleteFiles = await deleteFiles(filesToDelete,uploadFolder);
+
+      return res.json(infoDeleteFiles);
       
-    }
-    else{
-
-      let filesUpload = [...files.upload];
-
-      let listFiles = [];
-
-      filesUpload.forEach(file=>{
-
-        let {filepath,newFilename,originalFilename,mimetype} = file;
-
-        let propsFile = {
-          filepath,
-          newFilename,
-          originalFilename,
-          mimetype
-        }
-
-        listFiles.push(
-          Object.assign(
-            {},
-            propsFile,
-            isUploaded(uploadFolder.concat(`/${newFilename}`))
-          ));
-
-
-      })
-
-      return res.json({listFiles});
-
-    }
-
-  })
+    })
 
 })
 
-function isUploaded(path){
-  
-  if(fs.existsSync(path)){
+async function createFolderToUpload(uploadFolder){
+
+  try{
+
+    await fs.access(uploadFolder);
+
+  }
+  catch(err){
     
-    return {msg:"uploaded success",status:200}
+    await fs.mkdir(uploadFolder);
 
   }
 
-  return {msg:"uploaded fail",status:500};
+
+}
+
+async function deleteFiles(files,uploadFolder){
+
+  let infoErrorFile = [];
+  let infoSuccessFile = [];
+
+  files = JSON.parse(files);
+
+  for(let file of files){
+
+    try{
+
+     await fs.rm(uploadFolder.concat(`/${file.newFilename}`));
+
+     infoSuccessFile.push(
+      {
+        msgSuccess:"removed",
+        fileSuccess:file
+      }
+      )
+
+    }
+    catch(err){
+      
+      infoErrorFile.push(
+        {
+          msgError:err,
+          fileError:file
+        }
+        );
+
+    }
+    
+
+  }
+
+  return {infoErrorFile,infoSuccessFile};
+
+}
+
+function isUploaded(path){
+
+  try{
+
+    fs.access(path);
+
+    return {msg:"uploaded success",status:200}
+
+  }
+  catch(err){
+
+    return {msg:`uploaded fail: ${err}`,status:500};
+
+  }
+
 
 }
 
 module.exports = router;
+
+
+

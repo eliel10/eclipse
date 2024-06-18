@@ -9,7 +9,9 @@
     margin: 0;
     box-sizing: border-box;
 }
-
+body{
+    /* background-color: black; */
+}
 .container{
     width: 100vw;
     height: 100vh;
@@ -58,7 +60,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 2em;
-    justify-content:space-evenly;
+    
 }
 
 .list-files li{
@@ -308,7 +310,7 @@
 
     .list-files{
         gap: .5em;
-        padding-right: 3em;
+        padding-right: 1em;
     }
 
     .list-files li{
