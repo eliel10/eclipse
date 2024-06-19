@@ -157,20 +157,28 @@ class Upload{
 
     renameFile(){
 
+        if(this.getFileElementsActive().length < 1) return;
+
         let fileToRename = this.getFileElementsActive()[0];
 
         let fileInfo = JSON.parse(fileToRename.dataset.infofile);
 
         let oldFilename = fileInfo.originalFilename;
 
-        let newFilename = prompt("Digite o novo nome do arquivo:",oldFilename);
+        let lastDot = oldFilename.lastIndexOf(".");
 
-        fileInfo.originalFilename = newFilename;
+        let fileExt = oldFilename.slice(lastDot);
+
+        let newFilename = 
+        prompt("Digite o novo nome do arquivo:",oldFilename.slice(0,lastDot));
+
+        fileInfo.originalFilename = newFilename.concat(fileExt);
 
         let fileKey = fileInfo.key;
 
         this.getFirebaseRef().child(fileKey).set(fileInfo);
 
+        this.toggleOptionsElement();
 
     }
 
@@ -221,6 +229,9 @@ class Upload{
             this.getFirebaseRef().child(file.fileSuccess.key).remove();
 
         }
+
+        this.toggleOptionsElement();
+        this.toggleBtnsToFile();
 
     }
 
@@ -308,8 +319,9 @@ class Upload{
     getFileIcon(type){
 
         let mimetypes = {
+            "default":"default.png",
             "folder":"folder.png",
-            "image/jpeg":"pdf.png",
+            "image/jpeg":"default.png",
             "application/pdf":"pdf.png",
             "application/msword":"docx.png",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document":"docx.png",
@@ -334,7 +346,8 @@ class Upload{
             "text/html":"html.png"
         }
 
-        return mimetypes[type];
+        
+        return mimetypes[type] || mimetypes["default"];
 
     }
 

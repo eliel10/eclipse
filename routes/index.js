@@ -72,6 +72,8 @@ router.delete("/remove",(req,res)=>{
 
     form.parse(req,async(err,fields,files)=>{
 
+      if(err) res.json({Errir:err});
+
       let filesToDelete = fields.files;
 
       let infoDeleteFiles = await deleteFiles(filesToDelete,uploadFolder);
