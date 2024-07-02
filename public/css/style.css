@@ -239,6 +239,14 @@ body{
     display: none;
 }
 
+.current-folder .btn-folder{
+    background-color: transparent;
+    border: none;
+    font-size: 1em;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 /* media queries */
 
 @media (max-width:600px){

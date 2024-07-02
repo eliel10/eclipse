@@ -13,6 +13,8 @@ class Upload{
         this.btnRemoveOptions = this.upload_FileOptions.querySelector(".remove");
         this.btnNewFolder = this.upload_FileOptions.querySelector(".newFolder");
         this.fileList = document.querySelector(".list-files");
+        this.currentFolderEl = document.querySelector(".current-folder");
+        this.currentFolder = ["Home"];
         this.initialize();
 
     }
@@ -52,10 +54,46 @@ class Upload{
 
             })
 
+            fileEl.addEventListener("dblclick",event=>{
+
+                let {originalFilename, mimetype} = JSON.parse(fileEl.dataset.infofile);
+
+                if(mimetype == "folder"){
+
+                    this.openFolder(originalFilename);
+                    this.toggleOptionsElement();
+
+                }
+
+            })
+
         })
 
     }
 
+    initEventsBtnPath(){
+
+        let btnsPathFolder = [...document.querySelectorAll(".btn-folder")];
+
+        btnsPathFolder.forEach(btnPath=>{
+            
+            btnPath.addEventListener("click",event=>{
+
+                this.getFirebaseRef().off("value");
+
+                let folderPath = event.target.dataset.path.split("/");
+
+                this.currentFolder = folderPath;
+                
+                // this.readFiles();
+
+                this.openFolder();
+
+            })
+
+        })
+
+    }
 
     initEvents(){
 
@@ -104,7 +142,8 @@ class Upload{
 
         this.btnRemoveOptions.addEventListener("click",event=>{
 
-            this.deleteFile();
+            let filesSelected = this.getFileElementsActive();
+            this.deleteFile(filesSelected);
 
         })
 
@@ -123,9 +162,11 @@ class Upload{
 
         this.getFirebaseRef().push().set(folderProps);
 
+        this.toggleOptionsElement();
+
     }
 
-    toggleBtnsToFile(){
+    toggleBtnsToFile(remove){
 
         let filesSelected = this.getFileElementsActive();
 
@@ -134,7 +175,7 @@ class Upload{
             this.btnRenameOptions.style.display = "none";
 
         }
-        else if(filesSelected.length == 0){
+        else if(filesSelected.length == 0 || remove){
 
             this.btnRenameOptions.style.display = "none";
             this.btnRemoveOptions.style.display = "none";
@@ -151,7 +192,27 @@ class Upload{
 
     getFileElementsActive(){
 
-        return [...this.fileList.querySelectorAll(".active_li")];
+        let filesSelected = [...this.fileList.querySelectorAll(".active_li")];
+
+        let objectFiles = filesSelected.map(file=>JSON.parse(file.dataset.infofile))
+
+        
+        return objectFiles;
+
+    }
+
+
+    openFolder(folderName){
+
+        this.getFirebaseRef().off("value");
+
+        if(folderName) {
+
+            this.currentFolder.push(folderName);
+
+        }
+
+        this.readFiles();
 
     }
 
@@ -161,9 +222,7 @@ class Upload{
 
         let fileToRename = this.getFileElementsActive()[0];
 
-        let fileInfo = JSON.parse(fileToRename.dataset.infofile);
-
-        let oldFilename = fileInfo.originalFilename;
+        let oldFilename = fileToRename.originalFilename;
 
         let lastDot = oldFilename.lastIndexOf(".");
 
@@ -172,32 +231,43 @@ class Upload{
         let newFilename = 
         prompt("Digite o novo nome do arquivo:",oldFilename.slice(0,lastDot));
 
-        fileInfo.originalFilename = newFilename.concat(fileExt);
+        fileToRename.originalFilename = newFilename.concat(fileExt);
 
-        let fileKey = fileInfo.key;
+        let fileKey = fileToRename.key;
 
-        this.getFirebaseRef().child(fileKey).set(fileInfo);
+        this.getFirebaseRef().child(fileKey).set(fileToRename);
 
         this.toggleOptionsElement();
 
     }
 
-    deleteFile(){
+    deleteFile(files){
 
         let filesToDelete = [];
 
-        this.getFileElementsActive().forEach(file=>{
+        for(let file of files){
 
-            let {key,newFilename} = JSON.parse(file.dataset.infofile);
+            if(!file.mimetype) return;
 
-            filesToDelete.push({newFilename,key});
+            if(file.mimetype == "folder"){
 
-        })
+                this.deleteFolderFirebase(file);
 
+            }
+            else{
+                
+                let {newFilename,key} = file;
+                
+                filesToDelete.push({newFilename,key});
+
+            }
+
+        }
+        
         let data = new FormData();
 
         data.append("files",JSON.stringify(filesToDelete));
-
+        
         fetch("/remove",
             {
                 method:"DELETE",
@@ -213,13 +283,55 @@ class Upload{
 
     }
 
+    deleteFolderFirebase(folder,folderPath){
+        
+        if(!folderPath){
+
+            folderPath = [...this.currentFolder];
+            folderPath.push(folder.originalFilename);
+
+        }
+
+        this.getFirebaseRef(folderPath.join("/")).on("value",snapshot=>{
+
+            snapshot.forEach(snap=>{
+                
+                let fileValue = snap.val();
+                let key = snap.key;
+                let filePath = [...folderPath];
+                filePath.push(fileValue.originalFilename);
+
+                let file = {...fileValue,key};
+
+                if(fileValue.mimetype != "folder"){
+
+                    this.deleteFile([file]);
+
+                }
+                else{
+
+                    this.deleteFolderFirebase(file,filePath);
+
+                }
+
+            })
+
+        })
+        
+        this.getFirebaseRef().child(folder.key).remove();
+        this.currentFolder.push(folder.originalFilename);
+        this.getFirebaseRef().remove();
+        this.currentFolder.pop();
+    
+    }
+
     removeFileFirebase(files){
 
         let filesSuccess = files.infoSuccessFile;
         let filesError = files.infoErrorFile;
-
+        
         for(let file of filesError){
-
+            
             alert(`FileError: ${file.fileError.newFilename} | ${file.msgError.code}`);
 
         }
@@ -249,6 +361,7 @@ class Upload{
 
     }
 
+
     getFileElements(){
 
         return [...this.fileList.querySelectorAll("li")];
@@ -265,7 +378,6 @@ class Upload{
                 
                 files.forEach(file=>{
 
-                    console.log(file);
                     this.addFileFirebase(file);
 
                 })
@@ -282,8 +394,20 @@ class Upload{
 
     }
 
-    readFiles(){
+    getCurrentFolder(){
 
+        return this.currentFolder.join("/");
+
+    }
+
+    getFilesFirebase(){
+
+
+
+    }
+
+    readFiles(){
+        
         this.getFirebaseRef().on("value",snapshot=>{
 
             this.resetIconsFile();
@@ -299,19 +423,75 @@ class Upload{
 
         })
 
+        this.addFolderPathEl();
+
+        this.toggleBtnsToFile(true);
+
+    }
+
+    addFolderPathEl(){
+
+        let strPathEl = "";
+        let strPath = "";
+
+        this.getCurrentFolder().split("/").forEach((folderName,index,obj)=>{
+
+            if(index <= 0){
+                strPath += folderName;
+                strPathEl+=`<button data-path='${strPath}' class='btn-folder'>${folderName}</button>`;
+
+            }
+            else{
+
+                strPath += "/"+ folderName;
+                strPathEl+=`<span> > </span>
+                <button data-path='${strPath}' class='btn-folder'>${folderName}</button>`;
+
+            }
+            
+
+        })
+
+        this.currentFolderEl.innerHTML = strPathEl;
+
+        this.initEventsBtnPath();
+
     }
 
     addFileIcon(file){
 
         let fileInfoString = JSON.stringify(file);
 
-        this.fileList.innerHTML += 
-            `
+        let icon;
+
+        if(!file.mimetype) return;
+
+        switch(file.mimetype){
+            case "image/jpeg":
+            case "image/png":
+            case "image/jpg":
+            case "image/gif":
+            case "image/jiff":
+                icon =  `
+                <li data-infoFile='${fileInfoString}'>
+                    <img class="img-file" src="/${file.newFilename}">
+                    <span>${file.originalFilename}</span>
+                </li>
+                `;
+                break;
+            default:
+                icon = `
             <li data-infoFile='${fileInfoString}'>
                 <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
                 <span>${file.originalFilename}</span>
             </li>
-            `;
+            `;    
+
+
+        }
+
+        this.fileList.innerHTML += icon;
+            
 
             this.initEventsFile();            
     }
@@ -341,6 +521,7 @@ class Upload{
             "video/quicktime":"mp4.png",
             "video/webm":"mp4.png",
             "video/ogg":"mp4.png",
+            "video/avi":"mp4.png",
             "video/x-matroska":"mp4.png",
             "text/html":"html.png",
             "text/html":"html.png"
@@ -398,9 +579,22 @@ class Upload{
 
     }
 
-    getFirebaseRef(){
+    getFirebaseRef(path){
 
-        return firebase.database().ref("home");
+        let currentFolder;
+
+        if(path){
+
+            currentFolder = path;
+
+        }
+        else{
+
+            currentFolder = this.getCurrentFolder();
+
+        }
+        
+        return firebase.database().ref(currentFolder);
 
     }
 
