@@ -56,12 +56,17 @@ class Upload{
 
             fileEl.addEventListener("dblclick",event=>{
 
-                let {originalFilename, mimetype} = JSON.parse(fileEl.dataset.infofile);
+                let {originalFilename, mimetype, newFilename} = JSON.parse(fileEl.dataset.infofile);
 
                 if(mimetype == "folder"){
 
                     this.openFolder(originalFilename);
                     this.toggleOptionsElement();
+
+                }
+                else{
+
+                    this.downloadFile(newFilename);
 
                 }
 
@@ -146,6 +151,18 @@ class Upload{
             this.deleteFile(filesSelected);
 
         })
+
+    }
+
+    downloadFile(newFilename){
+
+        let LinkDownload = document.createElement("a");
+
+        LinkDownload.setAttribute("href",`/${newFilename}`);
+
+        LinkDownload.setAttribute("download","");
+
+        LinkDownload.click();
 
     }
 
@@ -518,6 +535,7 @@ class Upload{
             "audio/aac":"mp3.png",
             "video/x-msvideo":"mp4.png",
             "video/mpeg":"mp4.png",
+            "video/mp4":"mp4.png",
             "video/quicktime":"mp4.png",
             "video/webm":"mp4.png",
             "video/ogg":"mp4.png",

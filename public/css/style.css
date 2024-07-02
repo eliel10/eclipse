@@ -65,13 +65,19 @@ body{
 
 .list-files li{
     width: min-content;
+    max-width: 10em;
     text-align: center;
     padding: 2em;
 }
 
 .list-files .img-file{
     display: block;
-    width: 5em;
+    max-width: 5em;
+}
+
+.list-files li span{
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .files-option-container{
