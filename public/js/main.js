@@ -14,6 +14,7 @@ class Upload{
         this.btnNewFolder = this.upload_FileOptions.querySelector(".newFolder");
         this.fileList = document.querySelector(".list-files");
         this.currentFolderEl = document.querySelector(".current-folder");
+        this.indexElementsSelect = [];
         this.currentFolder = ["Home"];
         this.initialize();
 
@@ -29,22 +30,28 @@ class Upload{
 
     initEventsFile(){
 
-        this.getFileElements().forEach(fileEl=>{
+        this.getFileElements().forEach((fileEl,index)=>{
 
             fileEl.addEventListener("click",event=>{
+
 
                 if(event.ctrlKey){
 
                     this.selectFile(fileEl,{mult:true});
+                    this.indexElementsSelect.push(index);
 
                 }
                 else if(event.shiftKey){
 
+                    this.selectElementWithShift(index);
+
                 }
                 else{
 
+                    this.indexElementsSelect = [];
                     this.removeActiveClass();
                     this.selectFile(fileEl);
+                    this.indexElementsSelect.push(index);
 
                 }
 
@@ -151,6 +158,39 @@ class Upload{
             this.deleteFile(filesSelected);
 
         })
+
+    }
+
+    selectElementWithShift(index){
+
+        let filesEl = this.getFileElements();
+
+            let firstSelect = this.indexElementsSelect[0] || 0;
+            let start;
+            let end;
+
+            this.removeActiveClass();
+
+            if(firstSelect>index){
+
+                start = index;
+                end = firstSelect;
+
+            }
+            else{
+
+                start = firstSelect;
+                end = index;
+
+            }
+
+            while(start<=end){
+
+                this.selectFile(filesEl[start]);
+
+                start++;
+
+            }
 
     }
 
@@ -567,6 +607,7 @@ class Upload{
         }
 
         file.classList.add("active_li");
+        this.toggleBtnsToFile();
 
     }
 
