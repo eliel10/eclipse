@@ -11,3 +11,34 @@ let firebaseConfig = {
   };
 
 firebase.initializeApp(firebaseConfig);
+
+firebase.initializeApp(firebaseConfig);
+
+//--- auth
+
+// firebase.auth().createUserWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
+// .then((userCredential) => {
+//   // Signed in 
+//   var user = userCredential.user;
+//   // ...
+// })
+// .catch((error) => {
+//   var errorCode = error.code;
+//   var errorMessage = error.message;
+//   // ..
+// });
+
+
+//--- login
+
+firebase.auth().signInWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
+.then((userCredential) => {
+  // Signed in
+  var user = userCredential.user;
+  // ...
+})
+.catch((error) => {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  console.log(errorCode,errorMessage);
+});
