@@ -23,20 +23,22 @@ firebase.initializeApp(firebaseConfig);
 // .catch((error) => {
 //   var errorCode = error.code;
 //   var errorMessage = error.message;
+//   console.log(errorCode,errorMessage);
 //   // ..
 // });
 
 
-//--- login
+// //--- login
 
-firebase.auth().signInWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
-.then((userCredential) => {
-  // Signed in
-  var user = userCredential.user;
-  // ...
-})
-.catch((error) => {
-  var errorCode = error.code;
-  var errorMessage = error.message;
-  console.log(errorCode,errorMessage);
-});
+// firebase.auth().signInWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
+// .then((userCredential) => {
+//   // Signed in
+//   var user = userCredential.user;
+//   console.log(user);
+//   // ...
+// })
+// .catch((error) => {
+//   var errorCode = error.code;
+//   var errorMessage = error.message;
+//   console.log(errorCode,errorMessage);
+// });
