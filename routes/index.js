@@ -20,7 +20,8 @@ router.post("/upload",async(req,res)=>{
   let form = new formidable.IncomingForm(
     {
       uploadDir:uploadFolder,
-      keepExtensions:true
+      keepExtensions:true,
+      maxFileSize:1024 * 1024 * 10
     }
   );
 
@@ -28,7 +29,13 @@ router.post("/upload",async(req,res)=>{
 
       if(err){
   
-        return res.json({err});
+        if(err.code == 1009){
+
+          return res.json({msg:"arquivo muito grande"});
+
+        }
+
+        return res.json({msg:err});
         
       }
       else{

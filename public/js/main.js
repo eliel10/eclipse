@@ -431,13 +431,22 @@ class Upload{
 
         fetch("/upload",{method:"POST",body:data}).then(response=>{
 
-            response.json().then(files=>{
+            response.json().then(res=>{
+
+                if(!res.length){
+
+                    alert(res.msg);
+
+                }else{
+
+                    res.forEach(file=>{
+
+                        this.addFileFirebase(file);
+
+                    })
+
+                }
                 
-                files.forEach(file=>{
-
-                    this.addFileFirebase(file);
-
-                })
 
             })
 
