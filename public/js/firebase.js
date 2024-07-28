@@ -12,8 +12,6 @@ let firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-firebase.initializeApp(firebaseConfig);
-
 //--- auth
 
 // firebase.auth().createUserWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
