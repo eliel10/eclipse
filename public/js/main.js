@@ -208,9 +208,27 @@ class Upload{
 
     newFolder(){
 
+        let currentFolders = this.getFilesFirebase().filter(file=>{
+
+            return file.mimetype === "folder";
+
+        })
+
         let folderName = prompt("Digite o nome da pasta:");
 
         if(!folderName) return;
+
+        for(let folder of currentFolders){
+
+            if(folderName === folder.originalFilename){
+
+                alert("o nome já existe");
+
+                return;
+
+            }
+
+        }
 
         let folderProps = {
             originalFilename:folderName,
@@ -279,6 +297,8 @@ class Upload{
 
         let fileToRename = this.getFileElementsActive()[0];
 
+        let currentFiles = this.getFilesFirebase();
+
         let oldFilename = fileToRename.originalFilename;
 
         let lastDot = oldFilename.lastIndexOf(".");
@@ -287,6 +307,19 @@ class Upload{
 
         let newFilename = 
         prompt("Digite o novo nome do arquivo:",oldFilename.slice(0,lastDot));
+
+        for(let file of currentFiles){
+
+            if(file.originalFilename === newFilename.concat(fileExt) && fileToRename.mimetype === file.mimetype){
+
+                alert("o nome já existe");
+
+                return;
+
+            }
+
+        }
+
 
         fileToRename.originalFilename = newFilename.concat(fileExt);
 
@@ -468,7 +501,22 @@ class Upload{
 
     getFilesFirebase(){
 
+        let files = [];
 
+        this.getFirebaseRef().on("value",snapshot=>{
+
+            snapshot.forEach(file=>{
+
+                let fileKey = file.key;
+                let fileValue = file.val();
+
+                files.push({key:fileKey,...fileValue})
+
+            })
+
+        })
+
+        return files;
 
     }
 
