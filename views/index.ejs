@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel='stylesheet' href='/css/style.css' />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.3/axios.min.js" integrity="sha512-zJXKBryKlsiDaWcWQ9fuvy50SG03/Qc5SqfLXxHmk9XiUUbcD9lXYjHDBxLFOuZSU6ULXaJ69bd7blSMEgxXNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -11,6 +12,7 @@
     <script defer src="/js/firebase.js"></script>
     <script defer src="/js/main.js"></script>
     <script defer src="/js/index.js"></script>
+    <script defer src="/js/test.js"></script>
   </head>
   <body>
     <div class="container">
@@ -35,28 +37,6 @@
         <ul class="list-files">
           
         </ul>
-
-        <div class="upload-time-container">
-
-          <div class="upload-time-desc-info">
-
-            <div class="upload-time-desc-info-head">
-            <div class="icon-upload-rotate-container"><img class="icon-upload-rotate" src="/icons/loadUpload.png"></div>
-
-            <div class="upload-time-name-file">fazendo upload do arquivo txt.txt
-
-            </div>
-          </div>
-
-            <div class="upload-time-end">tempo restante 00:00:30</div>
-
-          </div>
-
-          <div class="upload-time-desc-view">
-            
-          </div>
-
-        </div>
     
       </main>
 
@@ -102,6 +82,28 @@
 
       </div>
 
+      <div class="upload-time-container">
+
+        <div class="upload-time-desc-info">
+
+          <div class="upload-time-desc-info-head">
+          <div class="icon-upload-rotate-container"><img class="icon-upload-rotate" src="/icons/loadUpload.png"></div>
+
+          <div class="upload-time-name-file">fazendo upload do arquivo txt.txt
+
+          </div>
+        </div>
+
+          <div class="upload-time-end">tempo restante 00:00:30</div>
+
+        </div>
+
+        <div class="upload-time-desc-view">
+          
+        </div>
+
+      </div>
+    
     </div>
   </body>
 </html>

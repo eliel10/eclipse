@@ -96,8 +96,6 @@ class Upload{
                 let folderPath = event.target.dataset.path.split("/");
 
                 this.currentFolder = folderPath;
-                
-                // this.readFiles();
 
                 this.openFolder();
 
@@ -216,6 +214,8 @@ class Upload{
 
         let folderName = prompt("Digite o nome da pasta:");
 
+        folderName = this.replaceSpaceNamefile(folderName,true);
+
         if(!folderName) return;
 
         for(let folder of currentFolders){
@@ -291,6 +291,27 @@ class Upload{
 
     }
 
+    replaceSpaceNamefile(name,remove){
+
+        if(!name) return false;
+
+        let newName;
+
+        if(remove){
+
+            newName = name.replace(/\s/g,"@");
+
+        }
+        else{
+
+            newName = name.replace(/@/g," ");
+
+        }
+
+        return newName;
+
+    }
+
     renameFile(){
 
         if(this.getFileElementsActive().length < 1) return;
@@ -301,12 +322,34 @@ class Upload{
 
         let oldFilename = fileToRename.originalFilename;
 
-        let lastDot = oldFilename.lastIndexOf(".");
+        let lastDot;
+
+        let isFolder = false;
+
+        if(fileToRename.mimetype === "folder"){
+
+            isFolder = true;
+
+            lastDot = oldFilename.lastIndexOf("");
+            
+
+        }
+        else{
+
+            lastDot = oldFilename.lastIndexOf(".");
+
+        }
 
         let fileExt = oldFilename.slice(lastDot);
 
         let newFilename = 
-        prompt("Digite o novo nome do arquivo:",oldFilename.slice(0,lastDot));
+        prompt("Digite o novo nome do arquivo:",this.replaceSpaceNamefile(oldFilename.slice(0,lastDot)));
+
+        if(isFolder){
+
+            newFilename = this.replaceSpaceNamefile(newFilename,true);
+
+        }
 
         for(let file of currentFiles){
 
@@ -358,18 +401,22 @@ class Upload{
 
         data.append("files",JSON.stringify(filesToDelete));
         
-        fetch("/remove",
+        axios.delete("/remove",
             {
-                method:"DELETE",
-                body:data
-            }
-        ).then(result=>{
-            result.json().then(files=>{
+                data,
+                headers:{"Content-Type":"multipart/form-data"}
+            }).then(result=>{
+
+                let files = result.data;
 
               this.removeFileFirebase(files);
 
-            })
+        }).catch(err=>{
+
+            alert(err);
+
         })
+
 
     }
 
@@ -462,9 +509,11 @@ class Upload{
 
         let data = new FormData(form);
 
-        fetch("/upload",{method:"POST",body:data}).then(response=>{
+        axios.post("/upload",data).then(response=>{
 
-            response.json().then(res=>{
+            console.log(response);
+
+            let res = response.data;
 
                 if(!res.length){
 
@@ -479,9 +528,10 @@ class Upload{
                     })
 
                 }
-                
 
-            })
+        }).catch(err=>{
+
+            alert(err);
 
         })
 
@@ -552,14 +602,14 @@ class Upload{
 
             if(index <= 0){
                 strPath += folderName;
-                strPathEl+=`<button data-path='${strPath}' class='btn-folder'>${folderName}</button>`;
+                strPathEl+=`<button data-path='${strPath}' class='btn-folder'>${this.replaceSpaceNamefile(folderName)}</button>`;
 
             }
             else{
 
                 strPath += "/"+ folderName;
                 strPathEl+=`<span> > </span>
-                <button data-path='${strPath}' class='btn-folder'>${folderName}</button>`;
+                <button data-path='${strPath}' class='btn-folder'>${this.replaceSpaceNamefile(folderName)}</button>`;
 
             }
             
@@ -589,15 +639,16 @@ class Upload{
                 icon =  `
                 <li data-infoFile='${fileInfoString}'>
                     <img class="img-file" src="/${file.newFilename}">
-                    <span>${file.originalFilename}</span>
+                    <span>${this.replaceSpaceNamefile(file.originalFilename)}</span>
                 </li>
                 `;
                 break;
+
             default:
                 icon = `
             <li data-infoFile='${fileInfoString}'>
                 <img class="img-file" src="/icons/${this.getFileIcon(file.mimetype)}">
-                <span>${file.originalFilename}</span>
+                <span>${this.replaceSpaceNamefile(file.originalFilename)}</span>
             </li>
             `;    
 

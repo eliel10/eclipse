@@ -187,12 +187,12 @@ body{
 }
 
 .upload-time-container{
-    display: none;
-    position: sticky;
-    bottom: 4rem;
-    width: 80%;
+    display: block;
+    position: absolute;
+    bottom: 8rem;
+    width: 40%;
     padding: .3em 0 0;
-    margin-left: calc(50% - 40%);
+    margin-left: 30%;
     border-radius: 20px;
     overflow: hidden;
     background-color: rgba(101, 105, 109, 0.9);
@@ -342,6 +342,11 @@ body{
         justify-content: space-between;
         align-items: center;
         padding: 2.3em 1em;
+    }
+
+    .upload-time-container{
+        width: 80%;
+        margin-left: 10%;
     }
 
     .file-options-buttons._active_upload-option button,

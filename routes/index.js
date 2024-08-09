@@ -27,6 +27,8 @@ router.post("/upload",async(req,res)=>{
 
     form.parse(req,(err,fields,files)=>{
 
+      console.log(files.upload);
+
       if(err){
   
         if(err.code == 1009){
@@ -75,11 +77,13 @@ router.post("/upload",async(req,res)=>{
 
 router.delete("/remove",(req,res)=>{
 
+  console.log(req);
+
     let form = new formidable.IncomingForm();
 
     form.parse(req,async(err,fields,files)=>{
 
-      if(err) res.json({Errir:err});
+      if(err) res.json({Error:err});
 
       let filesToDelete = fields.files;
 
