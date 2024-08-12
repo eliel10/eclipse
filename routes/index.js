@@ -21,18 +21,16 @@ router.post("/upload",async(req,res)=>{
     {
       uploadDir:uploadFolder,
       keepExtensions:true,
-      maxFileSize:1024 * 1024 * 10
+      maxFileSize:1024 * 1024 * 2000
     }
   );
 
     form.parse(req,(err,fields,files)=>{
 
-      console.log(files.upload);
-
       if(err){
   
         if(err.code == 1009){
-
+          console.log(err);
           return res.json({msg:"arquivo muito grande"});
 
         }

@@ -187,13 +187,13 @@ body{
 }
 
 .upload-time-container{
-    display: block;
+    display: none;
     position: absolute;
     bottom: 8rem;
     width: 40%;
     padding: .3em 0 0;
     margin-left: 30%;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
     background-color: rgba(101, 105, 109, 0.9);
 }
@@ -216,8 +216,7 @@ body{
 .upload-time-desc-view{
     height: 20px;
     background-color: #017076;
-    border-radius: 0px 20px 20px 0;
-    width: 50%;
+    width: 100%;
 }
 
 .icon-upload-rotate{

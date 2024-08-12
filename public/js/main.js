@@ -509,9 +509,21 @@ class Upload{
 
         let data = new FormData(form);
 
-        axios.post("/upload",data).then(response=>{
+        let files = data.values();
 
-            console.log(response);
+        for(let file of files){
+
+            console.log(file.size);
+
+        }
+
+        axios.post("/upload",data,{onUploadProgress:(progressEvent=>{
+
+            let percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+
+            this.toggleUploadProgressEl({percent});
+
+        })}).then(response=>{
 
             let res = response.data;
 
@@ -534,6 +546,43 @@ class Upload{
             alert(err);
 
         })
+
+    }
+
+    toggleUploadProgressEl(infoUpload){
+
+        let uploadProgressContainerEl = document.querySelector(".upload-time-container");
+
+        uploadProgressContainerEl.style.display = "block";
+
+        let progressBarEl = uploadProgressContainerEl.querySelector(".upload-time-desc-view");
+
+        progressBarEl.style.width = infoUpload.percent + "%";
+
+        if(infoUpload.percent == 100) uploadProgressContainerEl.style.display = "none";
+
+    }
+
+    uploadTimeEl(infoUpload){
+
+        return 
+        `<div class="upload-time-desc-info">
+
+          <div class="upload-time-desc-info-head">
+          <div class="icon-upload-rotate-container"><img class="icon-upload-rotate" src="/icons/loadUpload.png"></div>
+
+          <div class="upload-time-name-file">fazendo upload do arquivo txt.txt
+
+          </div>
+        </div>
+
+          <div class="upload-time-end">tempo restante 00:00:30</div>
+
+        </div>
+
+        <div class="upload-time-desc-view">
+          
+        </div>`
 
     }
 
