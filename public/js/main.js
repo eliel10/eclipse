@@ -2,6 +2,7 @@ class Upload{
 
     constructor(){
         
+        this.filesContainer = document.querySelector(".files-container");
         this.btnUploadFileEl = document.querySelector(".upload");
         this.inputUploadEl = document.querySelector(".file-upload");
         this.formUploadEl = document.querySelector(".input-upload-form");
@@ -107,6 +108,8 @@ class Upload{
 
     initEvents(){
 
+        this.dragFiles();
+
         this.btnUploadFileEl.addEventListener("click",event=>{
 
             this.inputUploadEl.click();
@@ -189,6 +192,37 @@ class Upload{
                 start++;
 
             }
+
+    }
+
+    dragFiles(){
+
+        this.filesContainer.addEventListener("dragover",event=>{
+
+            event.preventDefault();
+            
+            this.filesContainer.classList.add("dragover");
+
+        })
+
+
+        this.filesContainer.addEventListener("dragleave",event=>{
+
+            event.preventDefault();
+            
+            this.filesContainer.classList.remove("dragover");
+
+        })
+
+        this.filesContainer.addEventListener("drop",event=>{
+
+            event.preventDefault();
+
+            console.log(event);
+            
+            this.filesContainer.classList.remove("dragover");
+
+        })
 
     }
 

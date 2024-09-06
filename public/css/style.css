@@ -49,6 +49,14 @@ body{
     position: relative;
     overflow-y: auto;
     padding: 1em;
+    border:2px dotted transparent;
+}
+
+.dragover{
+
+    border-color: #014c71;
+    box-shadow: inset 0px 0px 17px 1px rgba(1,76,113,1);
+
 }
 
 .current-folder{

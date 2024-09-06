@@ -1,4 +1,3 @@
-
 let firebaseConfig = {
     apiKey: "AIzaSyCGfAVqp6M8Ix5-RDfrOI_d2Rzo3XvnIH8",
     authDomain: "eclipse-edb56.firebaseapp.com",
@@ -14,31 +13,28 @@ firebase.initializeApp(firebaseConfig);
 
 //--- auth
 
-// firebase.auth().createUserWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
-// .then((userCredential) => {
-//   // Signed in 
-//   var user = userCredential.user;
-//   // ...
-// })
-// .catch((error) => {
-//   var errorCode = error.code;
-//   var errorMessage = error.message;
-//   console.log(errorCode,errorMessage);
-//   // ..
-// });
+firebase.auth().createUserWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
+.then((userCredential) => {
+  // Signed in 
+  var user = userCredential.user;
+  // ...
+})
+.catch((error) => {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // ..
+});
 
 
 // //--- login
 
-// firebase.auth().signInWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
-// .then((userCredential) => {
-//   // Signed in
-//   var user = userCredential.user;
-//   console.log(user);
-//   // ...
-// })
-// .catch((error) => {
-//   var errorCode = error.code;
-//   var errorMessage = error.message;
-//   console.log(errorCode,errorMessage);
-// });
+firebase.auth().signInWithEmailAndPassword("eclipsedbfirebase@gmail.com", "Eclipsedbfirebase@10")
+.then((userCredential) => {
+  // Signed in
+  var user = userCredential.user;
+  // ...
+})
+.catch((error) => {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+});
