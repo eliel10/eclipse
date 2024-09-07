@@ -218,9 +218,13 @@ class Upload{
 
             event.preventDefault();
 
-            console.log(event);
-            
             this.filesContainer.classList.remove("dragover");
+
+            let filesToUpload = event.dataTransfer.files;
+
+            this.inputUploadEl.files = filesToUpload;
+
+            this.uploadFile(this.formUploadEl);
 
         })
 
@@ -532,6 +536,24 @@ class Upload{
 
     }
 
+    enableAndDisableUploadFile(disable = true){
+
+        let uploadBtn = this.btnUploadFileEl;
+
+        uploadBtn.disabled = true;
+
+        if(!disable){
+
+            uploadBtn.disabled = false;
+
+        }
+        else{
+
+            uploadBtn.disabled = true;
+
+        }
+
+    }
 
     getFileElements(){
 
@@ -541,15 +563,20 @@ class Upload{
 
     uploadFile(form){
 
-        let data = new FormData(form);
+        let data;
 
-        let files = data.values();
+        try{
 
-        for(let file of files){
-
-            console.log(file.size);
+            data = new FormData(form);
 
         }
+        catch(err){
+        
+            alert(err);
+
+        }
+
+        this.enableAndDisableUploadFile();
 
         axios.post("/upload",data,{onUploadProgress:(progressEvent=>{
 
@@ -575,9 +602,13 @@ class Upload{
 
                 }
 
+            this.enableAndDisableUploadFile(false);
+
         }).catch(err=>{
 
             alert(err);
+
+            this.enableAndDisableUploadFile(false);
 
         })
 
